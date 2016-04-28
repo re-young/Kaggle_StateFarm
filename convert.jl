@@ -37,10 +37,10 @@ h5open("train.hdf5", "w") do h5
     dset_label = d_create(h5, "label", datatype(Int64), dataspace(1, n_data))
 
 	# for each image set load and store it in the hdf5 data object
-	for i in 1:100#size(myFiles)[1]
+	for i in 1:size(myFiles)[1]
 
-		if mod(i,20)==0
-			println(i)
+		if mod(i,250)==0
+			println("On image number: ",i)
 		end
 	   
 	    img=load(myFiles[i]);
