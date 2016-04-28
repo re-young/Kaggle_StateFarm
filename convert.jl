@@ -1,12 +1,11 @@
-"""
-This script builds an HDF5 file out of the training data for
-State Farm Distracted Driver Detection
-"""
+
+# This script builds an HDF5 file out of the training data for
+# State Farm Distracted Driver Detection
+
 
 using HDF5
 using Colors
 using Images
-using ImageMagick
 
 searchdir(path,key) = filter(x->contains(x,key), readdir(path))
 
@@ -18,7 +17,7 @@ labels=[]
 for i=0:9
     files=searchdir("train/c$i/","jpg")
     for ff in files
-        push!(myFiles,abspath(ff))
+        push!(myFiles,"train/c$i/"*ff)
         push!(labels,i)
     end
 end
@@ -26,10 +25,13 @@ end
 
 #fix constats
 n_data=size(myFiles)[1]
-w=
-h=
+tmp=load(myFiles[1])
+tmp=convert(Array{Gray},tmp)
+w=size(tmp)[1]
+h=size(tmp)[2]
 
 #open hdf5 data objs
+
 h5open("train.hdf5", "w") do h5
     dset_data = d_create(h5, "data", datatype(Float32), dataspace(w, h, 1, n_data))
     dset_label = d_create(h5, "label", datatype(Int64), dataspace(1, n_data))
@@ -38,8 +40,10 @@ h5open("train.hdf5", "w") do h5
 # for each image set load and store it in the hdf5 data object
 for i in 1:size(myFiles)[1]
     
-    img=load(imgFiles[i]);
-    img=convert(Array{Gray},img);
+    img=load(myFiles[i]);
+
+    #convert to greyscale
+    img=convert(Array{Gray},img)
     
     #may need to convert
     dset_data[:,:,1,i] = img
@@ -47,5 +51,7 @@ for i in 1:size(myFiles)[1]
 end
 
 #write out files
-close(label_f)
-close(data_f)
+close(h5)
+#close(data)
+
+end
