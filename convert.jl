@@ -33,25 +33,25 @@ h=size(tmp)[2]
 #open hdf5 data objs
 
 h5open("train.hdf5", "w") do h5
-    dset_data = d_create(h5, "data", datatype(Float32), dataspace(w, h, 1, n_data))
+    dset_data = d_create(h5, "data", datatype(UInt8), dataspace(w, h, 1, n_data))
     dset_label = d_create(h5, "label", datatype(Int64), dataspace(1, n_data))
 
+	# for each image set load and store it in the hdf5 data object
+	for i in 1:100#size(myFiles)[1]
 
-# for each image set load and store it in the hdf5 data object
-for i in 1:size(myFiles)[1]
-    
-    img=load(myFiles[i]);
+		if mod(i,20)==0
+			println(i)
+		end
+	   
+	    img=load(myFiles[i]);
 
-    #convert to greyscale
-    img=convert(Array{Gray},img)
-    
-    #may need to convert
-    dset_data[:,:,1,i] = img
-    dset_label[1,i] = labels[i]
-end
+	    #convert to greyscale
+	    img=convert(Array{Gray},img)
+	    img=255.0*convert(Array{Float64},img)
 
-#write out files
-close(h5)
-#close(data)
+	    dset_data[:,:,1,i] =convert(Array{UInt8},round(img))
+
+	    dset_label[1,i] = labels[i]
+	end
 
 end
