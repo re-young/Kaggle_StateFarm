@@ -11,21 +11,21 @@ searchdir(path,key) = filter(x->contains(x,key), readdir(path))
 
 #Get all the file names.
 #Folder denotes the image class
-myFiles=[]
+imgFiles=[]
 labels=[]
 
 for i=0:9
     files=searchdir("train/c$i/","jpg")
     for ff in files
-        push!(myFiles,"train/c$i/"*ff)
+        push!(imgFiles,"train/c$i/"*ff)
         push!(labels,i)
     end
 end
 
 
 #fix constats
-n_data=size(myFiles)[1]
-tmp=load(myFiles[1])
+n_data=size(imgFiles)[1]
+tmp=load(imgFiles[1])
 tmp=convert(Array{Gray},tmp)
 w=size(tmp)[1]
 h=size(tmp)[2]
@@ -33,25 +33,24 @@ h=size(tmp)[2]
 #open hdf5 data objs
 
 h5open("train.hdf5", "w") do h5
-    dset_data = d_create(h5, "data", datatype(UInt8), dataspace(w, h, 1, n_data))
-    dset_label = d_create(h5, "label", datatype(Int64), dataspace(1, n_data))
+    dset_data = d_create(h5, "data", datatype(Float32), dataspace(w, h, 1, n_data))
+    dset_label = d_create(h5, "label", datatype(Float32), dataspace(1, n_data))
 
 	# for each image set load and store it in the hdf5 data object
-	for i in 1:size(myFiles)[1]
+	for i in 1:n_data
 
 		if mod(i,250)==0
-			println("On image number: ",i)
+			println("Proccessing image number: ",i)
 		end
 	   
-	    img=load(myFiles[i]);
+	    img=load(imgFiles[i]);
 
 	    #convert to greyscale
 	    img=convert(Array{Gray},img)
-	    img=255.0*convert(Array{Float64},img)
+	    img=convert(Array{Float32},img)
 
-	    dset_data[:,:,1,i] =convert(Array{UInt8},round(img))
-
-	    dset_label[1,i] = labels[i]
+	    dset_data[:,:,1,i] =img
+	    dset_label[1,i] = convert(Float32,labels[i])
 	end
 
 end
