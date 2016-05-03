@@ -1,9 +1,15 @@
+# This impliments a nerual network with the LeNet Architecture
+# The input data is convert to a HDF5 file using https://github.com/re-young/Kaggle_StateFarm/blob/master/convert.jl
+# The conversion script could be edited to hold back a validation set
+
+# TO DO:
+# 	-upload results
+
 
 using Mocha
 srand(12345678)
 
-
-
+# define the layers
 data_layer  = AsyncHDF5DataLayer(name="data-train", source="train.txt", batch_size=32, shuffle=true)
 conv_layer  = ConvolutionLayer(name="conv1", n_filter=20, kernel=(5,5), bottoms=[:data], tops=[:conv])
 pool_layer  = PoolingLayer(name="pool1", kernel=(2,2), stride=(2,2), bottoms=[:conv], tops=[:pool])
@@ -37,13 +43,8 @@ add_coffee_break(solver, TrainingSummary(), every_n_iter=100)
 # save snapshots every 5000 iterations
 add_coffee_break(solver, Snapshot(exp_dir), every_n_iter=5000)
 
+# train the solver
 solve(solver, net)
-
-#Profile.init(int(1e8), 0.001)
-#@profile solve(solver, net)
-#open("profile.txt", "w") do out
-#  Profile.print(out)
-#end
 
 destroy(net)
 destroy(test_net)

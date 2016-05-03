@@ -24,7 +24,7 @@ end
 
 
 #fix constats
-n_data=size(imgFiles)[1]
+n_data=200#size(imgFiles)[1]
 tmp=load(imgFiles[1])
 tmp=convert(Array{Gray},tmp)
 w=size(tmp)[1]
@@ -32,7 +32,7 @@ h=size(tmp)[2]
 
 #open hdf5 data objs
 
-h5open("train.hdf5", "w") do h5
+h5open("train_test.hdf5", "w") do h5
     dset_data = d_create(h5, "data", datatype(Float32), dataspace(w, h, 1, n_data))
     dset_label = d_create(h5, "label", datatype(Float32), dataspace(1, n_data))
 
